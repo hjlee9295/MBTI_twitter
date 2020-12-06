@@ -14,7 +14,20 @@ import matplotlib.pyplot as plt
 
 cwd = os.getcwd()
 predictor = ktrain.load_predictor(os.path.join(cwd, 'models'))
-predictor = ktrain.load_predictor('/Users/hojinlee/Documents/GitHub/MBTI_twitter/models')
+#predictor = ktrain.load_predictor('/Users/hojinlee/Documents/GitHub/MBTI_twitter/models')
+
+def get_twitter_api():
+
+    ckey=tk.ckey
+    csecret=tk.csecret
+    atoken=tk.atoken
+    asecret=tk.asecret
+
+    auth = OAuthHandler(ckey, csecret)
+    auth.set_access_token(atoken, asecret)
+
+    api = tweepy.API(auth)
+    return api
 
 def clean_text(text):
     regex = re.compile('[%s]' % re.escape('|'))
@@ -26,19 +39,9 @@ def clean_text(text):
     words = words.translate(words.maketrans('', '', string.punctuation))
     return words
 
-def getTweets(ID):
+def getTweets(ID, api):
 
     twitter_id = ID
-
-    ckey=tk.ckey
-    csecret=tk.csecret
-    atoken=tk.atoken
-    asecret=tk.asecret
-
-    auth = OAuthHandler(ckey, csecret)
-    auth.set_access_token(atoken, asecret)
-
-    api = tweepy.API(auth)
 
     tweets = tweepy.Cursor(api.user_timeline,id=twitter_id).items(50)
     tweets_list = [[tweet.text, tweet.created_at, tweet.id_str, tweet.user.screen_name, tweet.coordinates, tweet.place, tweet.retweet_count, tweet.favorite_count, tweet.lang, tweet.source, tweet.in_reply_to_status_id_str, tweet.in_reply_to_user_id_str, tweet.is_quote_status] for tweet in tweets]
@@ -46,8 +49,13 @@ def getTweets(ID):
 
     return tweets_df[['text', 'Tweet Datetime', 'Twitter @ Name']]
 
-def lookup_twitter_ID(ID):
-    return True
+def lookup_twitter_ID(ID, api):
+    try:
+        api.get_user(ID)
+        return True
+
+    except:
+        return False
 
 def startAnalyzing(texts):
 
@@ -82,16 +90,18 @@ def main():
         st.header("Please enter the twitter ID that you want to search")
 
         ID = st.text_input("Enter the ID: ", "@")
-        lookup_result = lookup_twitter_ID(ID)
-
+        api = get_twitter_api()
+        lookup_result = lookup_twitter_ID(ID, api)
+        st.write(lookup_result)
         checkID = st.button("Check ID")
 
         if checkID:
+
             if lookup_result:
                 st.success("{0} works!".format(ID))
 
                 number_of_tweets = 5
-                data_df = getTweets(ID)
+                data_df = getTweets(ID,api)
                 st.write(data_df.head(number_of_tweets))
 
                 global texts
