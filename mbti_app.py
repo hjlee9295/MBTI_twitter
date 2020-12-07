@@ -8,7 +8,6 @@ import tweepy
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
-import twitter_keys as tk
 
 import matplotlib.pyplot as plt
 
@@ -18,10 +17,10 @@ predictor = ktrain.load_predictor(os.path.join(cwd, 'models'))
 
 def get_twitter_api():
 
-    ckey=tk.ckey
-    csecret=tk.csecret
-    atoken=tk.atoken
-    asecret=tk.asecret
+    ckey=os.getenv("ckey", "optional-default")
+    csecret=os.getenv("csecret", "optional-default")
+    atoken=os.getenv("atoken", "optional-default")
+    asecret=os.getenv("asecret", "optional-default")
 
     auth = OAuthHandler(ckey, csecret)
     auth.set_access_token(atoken, asecret)
