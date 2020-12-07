@@ -11,11 +11,7 @@ from tweepy.streaming import StreamListener
 
 import matplotlib.pyplot as plt
 
-cwd = os.getcwd()
-model_paths = os.path.join(cwd, 'models')
-st.write(model_paths)
-predictor = ktrain.load_predictor(model_paths)
-#predictor = ktrain.load_predictor('/Users/hojinlee/Documents/GitHub/MBTI_twitter/models')
+predictor = ktrain.load_predictor('/models')
 
 def get_twitter_api():
     
