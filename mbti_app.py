@@ -11,7 +11,8 @@ from tweepy.streaming import StreamListener
 
 import matplotlib.pyplot as plt
 
-predictor = ktrain.load_predictor('models')
+fpath = os.path.join(os.get_cwd(),'models')
+predictor = ktrain.load_predictor(fpath)
 
 def get_twitter_api():
     
