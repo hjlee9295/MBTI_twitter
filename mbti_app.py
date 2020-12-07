@@ -12,15 +12,17 @@ from tweepy.streaming import StreamListener
 import matplotlib.pyplot as plt
 
 cwd = os.getcwd()
-predictor = ktrain.load_predictor(os.path.join(cwd, 'models'))
+model_paths = os.path.join(cwd, 'models')
+st.write(model_paths)
+predictor = ktrain.load_predictor(model_paths)
 #predictor = ktrain.load_predictor('/Users/hojinlee/Documents/GitHub/MBTI_twitter/models')
 
 def get_twitter_api():
-
-    ckey=os.getenv("ckey", "optional-default")
-    csecret=os.getenv("csecret", "optional-default")
-    atoken=os.getenv("atoken", "optional-default")
-    asecret=os.getenv("asecret", "optional-default")
+    
+    ckey=os.environ['ckey']
+    csecret=os.environ['csecret']
+    atoken=os.environ['atoken']
+    asecret=os.environ['asecret']
 
     auth = OAuthHandler(ckey, csecret)
     auth.set_access_token(atoken, asecret)
