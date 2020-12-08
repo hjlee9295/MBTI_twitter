@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)),'models')
 
 preproc_name = os.path.join(fpath, 'tf_model.preproc')
+st.write(preproc_name)
 #with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
 preproc = joblib.load(preproc_name)
 
