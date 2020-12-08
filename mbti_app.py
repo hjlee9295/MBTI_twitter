@@ -19,15 +19,17 @@ import matplotlib.pyplot as plt
 
 fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)),'models')
 
+
 preproc_name = os.path.join(fpath, 'tf_model.preproc')
 preproc_isfile = os.path.isfile(preproc_name) 
 st.write(preproc_name)
 st.write(preproc_isfile)
+predictor = ktrain.load_predictor(fpath)
 #with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
-preproc = joblib.load(preproc_name)
+#preproc = joblib.load(preproc_name)
 
-model = preproc.get_model(fpath=fpath)
-predictor = text.predictor.TextPredictor(model, preproc, batch_size=32)
+#model = preproc.get_model(fpath=fpath)
+#predictor = text.predictor.TextPredictor(model, preproc, batch_size=32)
 
 def get_twitter_api():
     
