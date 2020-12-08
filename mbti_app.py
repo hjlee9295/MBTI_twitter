@@ -8,7 +8,7 @@ import pandas as pd
 import streamlit as st
 
 import ktrain
-from ktrain.text.predictor import TextPredictor
+from ktrain import text
 
 import tweepy
 from tweepy import Stream
@@ -27,7 +27,7 @@ st.write(preproc_isfile)
 preproc = joblib.load(preproc_name)
 
 model = preproc.get_model(fpath=fpath)
-predictor = TextPredictor(model, preproc, batch_size=32)
+predictor = text.predictor.TextPredictor(model, preproc, batch_size=32)
 
 def get_twitter_api():
     
