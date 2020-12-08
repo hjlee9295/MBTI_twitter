@@ -23,7 +23,6 @@ with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
 model = preproc.get_model(fpath=fpath)
 predictor = TextPredictor(model, preproc, batch_size=32)
 
-
 def get_twitter_api():
     
     ckey=os.environ['ckey']
@@ -100,7 +99,6 @@ def main():
         ID = st.text_input("Enter the ID: ", "@")
         api = get_twitter_api()
         lookup_result = lookup_twitter_ID(ID, api)
-        st.write(lookup_result)
         checkID = st.button("Check ID")
 
         if checkID:
@@ -111,8 +109,6 @@ def main():
                 number_of_tweets = 5
                 data_df = getTweets(ID,api)
                 st.write(data_df.head(number_of_tweets))
-
-                global texts
                 texts = ''
 
                 for tweet_text in data_df.text.values.tolist():
