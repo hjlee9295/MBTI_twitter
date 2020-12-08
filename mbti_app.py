@@ -64,7 +64,7 @@ def lookup_twitter_ID(ID, api):
     except:
         return False
 
-def startAnalyzing(texts):
+def startAnalyzing(texts,source):
 
     st.write(texts)
     test_text = clean_text(texts)
@@ -78,7 +78,7 @@ def startAnalyzing(texts):
         st.write(predicted)
         st.write(probabilities_df[['Probabilities_pct']].T)
 
-    st.subheader('This person is {} with probability of {:.2%}'.format(predicted, max(probabilities)))
+    st.subheader('Based on {}, this person is {} with probability of {:.2%}'.format(source, predicted, max(probabilities)))
 
     fig, ax = plt.subplots()
     ax.bar(probabilities_df.index, probabilities_df.Probabilities)
@@ -91,7 +91,7 @@ categories = ['INFJ', 'ENTP', 'INTP', 'INTJ', 'ENTJ', 'ENFJ', 'INFP', 'ENFP', 'I
 def main():
 
     st.title("What's your Twitter Persona's MBTI?")
-    inputType = st.radio("Do you want to give Twitter ID or raw text",("Twitter", "Raw Text"))
+    inputType = st.radio("Do you want to give Twitter ID or raw text?",("Twitter", "Raw Text"))
 
     if inputType == "Twitter":
         st.header("Please enter the twitter ID that you want to search")
@@ -115,7 +115,7 @@ def main():
                     texts += tweet_text
                     texts += ' '
                 
-                startAnalyzing(texts)
+                startAnalyzing(texts,'recent 5 tweets')
         
             else:
                 st.error("Try Different ID")
@@ -127,7 +127,7 @@ def main():
             result = texts
             st.success(result)
 
-            startAnalyzing(texts)
+            startAnalyzing(texts,'given texts')
 
     st.sidebar.header("About")
     st.sidebar.text("This is a work of Hojin Lee.")
