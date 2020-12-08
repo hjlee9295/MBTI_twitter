@@ -1,8 +1,12 @@
 import os, re
+import json
 import string
-import ktrain
+import pickle
 import pandas as pd
 import streamlit as st
+
+import ktrain
+from ktrain.text.predictor import TextPredictor
 
 import tweepy
 from tweepy import Stream
@@ -11,9 +15,14 @@ from tweepy.streaming import StreamListener
 
 import matplotlib.pyplot as plt
 
-fpath = os.path.join('./','models')
-st.write(fpath)
-predictor = ktrain.load_predictor(fpath)
+fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)),'models')
+
+preproc_name = os.path.join(fpath, 'tf_model.preproc')
+with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
+
+model = preproc.get_model(fpath=fpath)
+predictor = TextPredictor(model, preproc, batch_size=32)
+
 
 def get_twitter_api():
     
