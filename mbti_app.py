@@ -11,7 +11,7 @@ from tweepy.streaming import StreamListener
 
 import matplotlib.pyplot as plt
 
-fpath = os.path.join('./','models')
+fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)),'models')
 st.write(fpath)
 predictor = ktrain.load_predictor(fpath)
 
