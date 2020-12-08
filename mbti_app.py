@@ -18,7 +18,8 @@ import matplotlib.pyplot as plt
 fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)),'models')
 
 preproc_name = os.path.join(fpath, 'tf_model.preproc')
-with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
+#with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
+preproc = joblib.load(preproc_name)
 
 model = preproc.get_model(fpath=fpath)
 predictor = TextPredictor(model, preproc, batch_size=32)
