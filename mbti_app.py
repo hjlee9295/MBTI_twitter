@@ -125,7 +125,7 @@ def main():
         texts = st.text_area("Enter Your Message:", "Type Here")
         if st.button("Submit"):
             result = texts
-            st.success(result)
+            st.success("Text Submitted Successfully!")
 
             startAnalyzing(texts,'given texts')
 
