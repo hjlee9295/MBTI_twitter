@@ -24,6 +24,7 @@ preproc_name = os.path.join(fpath, 'tf_model.preproc')
 preproc_isfile = os.path.isfile(preproc_name) 
 st.write(preproc_name)
 st.write(preproc_isfile)
+global predictor
 predictor = ktrain.load_predictor(fpath)
 #with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
 #preproc = joblib.load(preproc_name)
