@@ -3,7 +3,6 @@ streamlit==0.72.0
 pandas==1.1.2
 tweepy==3.8.0
 matplotlib==3.2.1
-tensorflow==2.3.1
-transformers==3.3.1
-joblib==0.14.1
+transformers==3.5.1
+onnxruntime==1.6.0
 numpy==1.18.5
