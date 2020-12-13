@@ -1,12 +1,11 @@
 import os, re
-import json
 import string
 import pickle
-import joblib
 import numpy as np
 import pandas as pd
 import streamlit as st
 
+import transformers
 import ktrain
 from ktrain import text
 
@@ -18,26 +17,29 @@ from tweepy.streaming import StreamListener
 import matplotlib.pyplot as plt
 
 fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)),'models')
+onnx_model_path = os.path.join(fpath, 'onnx_model.onnx')
+tokenizer_path = os.path.join(fpath, 'tokenizer.pickle')
 
+def create_onnx_session(onnx_model_path):
+    provider='CPUExecutionProvider'
+    from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions, get_all_providers
+    assert provider in get_all_providers(), f"provider {provider} not found, {get_all_providers()}"
+    options = SessionOptions()
+    options.intra_op_num_threads = 0
+    options.graph_optimization_level = GraphOptimizationLevel.ORT_ENABLE_ALL
+    session = InferenceSession(onnx_model_path, options, providers=[provider])
+    session.disable_fallback()
+    return session
 
-preproc_name = os.path.join(fpath, 'tf_model.preproc')
-preproc_isfile = os.path.isfile(preproc_name) 
-st.write(preproc_name)
-st.write(preproc_isfile)
-global predictor
-predictor = ktrain.load_predictor(fpath)
-#with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
-#preproc = joblib.load(preproc_name)
-
-#model = preproc.get_model(fpath=fpath)
-#predictor = text.predictor.TextPredictor(model, preproc, batch_size=32)
+global sess
+sess = create_onnx_session(onnx_model_path)
 
 def get_twitter_api():
     
-    ckey=os.environ['ckey']
-    csecret=os.environ['csecret']
-    atoken=os.environ['atoken']
-    asecret=os.environ['asecret']
+    ckey=os.environ.get('ckey', None)
+    csecret=os.environ.get('csecret', None)
+    atoken=os.environ.get('atoken', None)
+    asecret=os.environ.get('asecret', None)
 
     auth = OAuthHandler(ckey, csecret)
     auth.set_access_token(atoken, asecret)
@@ -79,8 +81,22 @@ def startAnalyzing(texts,source):
     test_text = clean_text(texts)
 
     with st.spinner('Predicting...'):
-        predicted = predictor.predict(test_text)
-        probabilities = predictor.predict_proba(test_text)
+        
+        with open(tokenizer_path, 'rb') as handle:
+            tokenizer = pickle.load(handle)
+        
+        input_dict = tokenizer(test_text, max_length=512, padding='max_length', truncation=True)
+        feed = {}
+        feed['input_ids'] = np.array(input_dict['input_ids']).astype('int32')[None,:]
+        feed['attention_mask'] = np.array(input_dict['attention_mask']).astype('int32')[None,:]
+        output_onnx = sess.run(None, feed)
+
+        total = sum([(np.exp(i)/(1+np.exp(i))) for i in output_onnx[0][0]])
+        predicted = categories[np.argmax(output_onnx[0][0])]
+        probabilities = [(np.exp(i)/(1+np.exp(i)))/total for i in output_onnx[0][0]]
+
+        # predicted = predictor.predict(test_text)
+        # probabilities = predictor.predict_proba(test_text)
         probabilities_df = pd.DataFrame(probabilities, categories)
         probabilities_df.columns = ['Probabilities']
         probabilities_df['Probabilities_pct'] = pd.Series(["{0:.2f}%".format(val * 100) for val in probabilities_df['Probabilities']], index = probabilities_df.index)
@@ -94,6 +110,7 @@ def startAnalyzing(texts,source):
     plt.xticks(rotation=45)
     
     st.pyplot(fig)
+
 
 categories = ['INFJ', 'ENTP', 'INTP', 'INTJ', 'ENTJ', 'ENFJ', 'INFP', 'ENFP', 'ISFP', 'ISTP', 'ISFJ', 'ISTJ', 'ESTP', 'ESFP', 'ESTJ', 'ESFJ']
 
