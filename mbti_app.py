@@ -6,8 +6,6 @@ import pandas as pd
 import streamlit as st
 
 import transformers
-import ktrain
-from ktrain import text
 
 import tweepy
 from tweepy import Stream
